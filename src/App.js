@@ -1,67 +1,52 @@
-import React, {Component} from 'react';
-import Navbar from './components/layout/Navbar';
-import Users from './components/users/Users';
-import Search from './components/users/Search';
-import './App.css';
-import axios from 'axios';
+import React, { Fragment, useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Navbar from "./components/layout/Navbar";
+import Users from "./components/users/Users";
+import User from "./components/users/User";
+import Search from "./components/users/Search";
+import Alert from "./components/layout/Alert";
+import About from "./components/pages/About";
+import "./App.css";
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <h1>Hello From React</h1>
-//     </div>
-//   );
-// }
+import GithubState from "./context/gitHub/GitHubState";
+const App = () => {
+  const [alert, setAlert] = useState(null);
+  const getAlert = (msg, type) => {
+    setAlert({
+      msg,
+      type
+    });
+    setTimeout(() => {
+      setAlert(null);
+    }, 5000);
+  };
 
-// export default App;
-
-class App extends Component {
-  state = {
-    users: [],
-    loading: true
-  }
-  async componentDidMount () {
-    this.setState({
-      loading: true,
-    })
-    // console.log("1234")
-    const res = await
-    axios.get(`https://api.github.com/users?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`);
-    this.setState({
-      loading: false,
-      users: res.data
-    })
-    // console.log(res.data)
-  }
-  render () {
-    return (
-      <div className="App">
-        < Navbar title= " gitHub Finder" icon= "fab fa-github"/>
-        <Search/>
-        <div className="container">
-          < Users loading = {this.state.loading} users={this.state.users}/>
+  return (
+    <GithubState>
+      <Router>
+        <div className='App'>
+          <Navbar title=' gitHub Finder' icon='fab fa-github' />
+          <div className='container'>
+            <Alert alert={alert} />
+            <Switch>
+              <Route
+                exact
+                path='/'
+                render={props => (
+                  <Fragment>
+                    <Search setAlert={getAlert} />
+                    <Users />
+                  </Fragment>
+                )}
+              />
+              <Route exact path='/about' component={About} />
+              <Route exact path='/user/:login' component={User} />
+            </Switch>
+          </div>
         </div>
-      </div>
-    );
-  } 
-}
+      </Router>
+    </GithubState>
+  );
+};
 
 export default App;
-
-// {
-//   bar = () => "bar";
-//   foo = () => "foo"
-//   render () {
-//     const name = "John Doe";
-//     const foop = () => "Ryan";
-//     const loading = false;
-//     const showName = true;
-//     return (
-//       <div className="App">
-//         <h1>Hello {name.toUpperCase()}</h1>
-//         <h1>Hello {foop()}</h1>
-//         {loading ? <h1>Hello there {this.bar()}</h1> : <h1>Hello {this.foo()}</h1>  }
-//         {showName && name}
-//       </div>
-//     );
-//   }
